@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Typhoid Predictor</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .container {
+            width: 100%;
+            max-width: 900px; /* Reduced max-width for a smaller interface */
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            background-color: #fff;
+            border-radius: 8px;
+            text-align: center;
+        }
+        h1 {
+            color: #9a1e1e;
+            margin-bottom: 20px;
+        }
+        .form-section {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 15px; /* Adjusted spacing for a tighter layout */
+            align-items: center;
+            justify-content: center;
+        }
+        .form-section label {
+            margin-bottom: 5px;
+            text-align: left;
+        }
+        .form-section input, .form-section select {
+            width: 100%;
+            max-width: 250px; /* Reduced max-width for a smaller interface */
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            margin-bottom: 10px;
+        }
+        button {
+            background-color: #9a1e1e;
+            color: #fff;
+            border: none;
+            padding: 10px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #7e1a1a;
+        }
+        .overlay {
+            display: none;
+        }
+        .overlay.active {
+            display: block;
+        }
+        .notification {
+            margin-top: 10px;
+            padding: 10px;
+            background-color: #ffebcc;
+            border: 1px solid #ffd700;
+            border-radius: 4px;
+        }
+        .section {
+            margin-bottom: 20px;
+        }
+        .horizontal-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .horizontal-container label {
+            width: 30%;
+            text-align: left;
+        }
+        .horizontal-container input, .horizontal-container select {
+            width: 50%;
+        }
+        /* New style for Typhoid Predictor section */
+        .predictor-container {
+            background-color:white;
+            border: 1px solid #d81313;
+            border-radius: 40px;
+            padding: 50px;
+        }
+        .predictor-title {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #d51b1b;
+            margin-bottom: 20px;
+        }
+        h1.predictor-title {
+            font-size: 2em; /* Larger font size for better visibility */
+            font-weight: bold;
+            color: #f41414; /* Ensure color contrasts with background */
+            margin-bottom: 30px; /* Increased margin for separation from other elements */
+            text-align: center; /* Center-align title */
+            background-color: #e6f7ff; /* Background color to make title stand out */
+            padding: 10px; /* Add some padding */
+            border-radius: 5px; /* Rounded corners for the title background */
+        }
+        
+        .spaced-button {
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <!-- Sign Up -->
+    <div class="overlay" id="signupContainer">
+        <h1>Sign Up</h1>
+        <form id="signupForm">
+            <label for="signupUsername">Username:</label>
+            <input type="text" id="signupUsername" name="signupUsername" required>
+            <label for="signupPassword">Password:</label>
+            <input type="password" id="signupPassword" name="signupPassword" required>
+            <button type="button" onclick="signUp()">Sign Up</button>
+        </form>
+        <p>Already have an account? <a href="#" onclick="showLogin()">Login</a></p>
+    </div>
+
+    <!-- Login -->
+    <div class="overlay" id="loginContainer">
+        <h1>Login</h1>
+        <form id="loginForm">
+            <label for="username">Username:</label>
+            <input type="text" id="username" name="username" required>
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password" required>
+            <button type="button" onclick="login()">Login</button>
+        </form>
+        <p>Forgot password? <a href="#" onclick="showResetPassword()">Reset Password</a></p>
+        <p>Don't have an account? <a href="#" onclick="showSignup()">Sign Up</a></p>
+    </div>
+
+    <!-- Reset Password -->
+    <div class="overlay" id="resetPasswordContainer">
+        <h1>Reset Password</h1>
+        <form id="resetPasswordForm">
+            <label for="resetUsername">Username:</label>
+            <input type="text" id="resetUsername" name="resetUsername" required>
+            <label for="newPassword">New Password:</label>
+            <input type="password" id="newPassword" name="newPassword" required>
+            <button type="button" onclick="resetPassword()">Reset Password</button>
+        </form>
+        <p>Remembered your password? <a href="#" onclick="showLogin()">Login</a></p>
+    </div>
+
+    <!-- Main Form -->
+    <div class="overlay predictor-container" id="formContainer">
+        <h1>Typhoid Predictor</h1>
+        <form id="typhoidForm">
+            <div class="form-section">
+                <label for="age">Age:</label>
+                <input type="number" id="age" name="age" required>
+            </div>
+            <div class="form-section">
+                <label for="sex">Sex:</label>
+                <select id="sex" name="sex">
+                    <option value="male">Male</option>
+                    <option value="female">Female</option>
+                </select>
+            </div>
+            <div class="form-section">
+                <label for="temp">High Temperature:</label>
+                <select id="temp" name="temp">
+                    <option value="yes">Yes</option>
+                    <option value="no">No</option>
+                </select>
+            </div>
+            <div class="form-section">
+                <label for="pains">Body/Abdominal Pains:</label>
+                <select id="pains" name="pains">
+                    <option value="yes">Yes</option>
+                    <option value="no">No</option>
+                </select>
+            </div>
+            <div class="form-section">
+                <label for="dizziness">Dizziness/Weakness:</label>
+                <select id="dizziness" name="dizziness">
+                    <option value="yes">Yes</option>
+                    <option value="no">No</option>
+                </select>
+            </div>
+            <div class="form-section">
+                <label for="vomiting">Vomiting:</label>
+                <select id="vomiting" name="vomiting">
+                    <option value="yes">Yes</option>
+                    <option value="no">No</option>
+                </select>
+            </div>
+            <div class="form-section">
+                <label for="headache">Headache:</label>
+                <select id="headache" name="headache">
+                    <option value="yes">Yes</option>
+                    <option value="no">No</option>
+                </select>
+            </div>
+            <div class="form-section">
+                <label for="widalCount">Widal Count:</label>
+                <select id="widalCount" name="widalCount">
+                    <option value="below">Below 1/160</option>
+                    <option value="above">Above 1/160</option>
+                </select>
+            </div>
+            <div class="spaced-button">
+                <button type="button" onclick="checkTyphoid()">Check</button>
+            </div>
+        </form>
+        <div class="section">
+            <button onclick="showProfile()">Profile</button>
+            <button onclick="showHistory()">Health Record</button>
+            <button onclick="showSuggestions()">Safety Suggestions</button>
+            <button onclick="showFeedback()">Feedback</button>
+            <button onclick="logout()">Logout</button>
+        </div>
+    </div>
+
+    <!-- Profile -->
+    <div class="overlay" id="profileContainer">
+        <h1>User Profile</h1>
+        <p><strong>Username:</strong> <span id="profileUsername"></span></p>
+        <p><strong>Age:</strong> <span id="profileAge"></span></p>
+        <button onclick="backToForm()">Back</button>
+    </div>
+
+    <!-- Health Record -->
+    <div class="overlay" id="historyContainer">
+        <h1>Health Record</h1>
+        <ul id="historyList"></ul>
+        <button onclick="backToForm()">Back</button>
+    </div>
+
+    <!-- Safety Suggestions -->
+    <div class="overlay" id="suggestionsContainer">
+        <h1>Safety Suggestions</h1>
+        <ul>
+            <li>Maintain good hygiene practices.</li>
+            <li>Drink only boiled or treated water.</li>
+            <li>Avoid food from street vendors.</li>
+            <li>Get vaccinated if traveling to high-risk areas.</li>
+        </ul>
+        <button onclick="backToForm()">Back</button>
+    </div>
+
+    <!-- Feedback -->
+    <div class="overlay" id="feedbackContainer">
+        <h1>Feedback</h1>
+        <form id="feedbackForm">
+            <label for="feedback">Your Feedback:</label>
+            <textarea id="feedback" name="feedback" rows="4" required></textarea>
+            <button type="button" onclick="submitFeedback()">Submit</button>
+        </form>
+        <button onclick="backToForm()">Back</button>
+    </div>
+</div>
+
+<script>
+    function showLogin() {
+        toggleVisibility('loginContainer');
+    }
+
+    function showSignup() {
+        toggleVisibility('signupContainer');
+    }
+
+    function showResetPassword() {
+        toggleVisibility('resetPasswordContainer');
+    }
+
+    function signUp() {
+        const username = document.getElementById('signupUsername').value;
+        const password = document.getElementById('signupPassword').value;
+
+        if (username && password) {
+            localStorage.setItem('username', username);
+            localStorage.setItem('password', password);
+            alert('Sign-up successful! Please log in.');
+            showLogin();
+        } else {
+            alert('Please fill in both fields');
+        }
+    }
+
+    function login() {
+        const username = document.getElementById('username').value;
+        const password = document.getElementById('password').value;
+        const storedUsername = localStorage.getItem('username');
+        const storedPassword = localStorage.getItem('password');
+
+        if (username === storedUsername && password === storedPassword) {
+            document.getElementById('loginContainer').style.display = 'none';
+            document.getElementById('formContainer').style.display = 'block';
+            document.getElementById('profileUsername').innerText = username;
+        } else {
+            alert('Invalid login credentials');
+        }
+    }
+
+    function resetPassword() {
+        const username = document.getElementById('resetUsername').value;
+        const newPassword = document.getElementById('newPassword').value;
+        const storedUsername = localStorage.getItem('username');
+
+        if (username === storedUsername) {
+            localStorage.setItem('password', newPassword);
+            alert('Password reset successful! Please log in with your new password.');
+            showLogin();
+        } else {
+            alert('Invalid username');
+        }
+    }
+
+    function checkTyphoid() {
+        const age = document.getElementById('age').value;
+        const temp = document.getElementById('temp').value;
+        const pains = document.getElementById('pains').value;
+        const dizziness = document.getElementById('dizziness').value;
+        const vomiting = document.getElementById('vomiting').value;
+        const headache = document.getElementById('headache').value;
+        const widalCount = document.getElementById('widalCount').value;
+
+        const symptoms = [temp, pains, dizziness, vomiting, headache];
+        const symptomCount = symptoms.filter(symptom => symptom === 'yes').length;
+
+        const result = (symptomCount >= 3 && widalCount === 'above') ? "Typhoid Positive" : "Typhoid Negative";
+
+        saveHealthRecord({ age, temp, pains, dizziness, vomiting, headache, widalCount, result });
+
+        const resultWindow = window.open("", "Typhoid Result", "width=400, height=200, top=50%, left=50%");
+        resultWindow.document.write("<h1 style='text-align: center; color:purple; background-color:pink; margin-top: 50px;'>" + result + "</h1>");
+    }
+
+    function saveHealthRecord(record) {
+        const history = JSON.parse(localStorage.getItem('healthHistory')) || [];
+        history.push(record);
+        localStorage.setItem('healthHistory', JSON.stringify(history));
+    }
+
+    function showProfile() {
+        document.getElementById('formContainer').style.display = 'none';
+        document.getElementById('profileContainer').style.display = 'block';
+    }
+
+    function showHistory() {
+        const history = JSON.parse(localStorage.getItem('healthHistory')) || [];
+        const historyList = document.getElementById('historyList');
+        historyList.innerHTML = '';
+        history.forEach((record, index) => {
+            const listItem = document.createElement('li');
+            listItem.innerText = `Record ${index + 1}: Age: ${record.age}, Result: ${record.result}`;
+            historyList.appendChild(listItem);
+        });
+
+        document.getElementById('formContainer').style.display = 'none';
+        document.getElementById('historyContainer').style.display = 'block';
+    }
+
+    function showSuggestions() {
+        document.getElementById('formContainer').style.display = 'none';
+        document.getElementById('suggestionsContainer').style.display = 'block';
+    }
+
+    function showFeedback() {
+        document.getElementById('formContainer').style.display = 'none';
+        document.getElementById('feedbackContainer').style.display = 'block';
+    }
+
+    function submitFeedback() {
+        const feedback = document.getElementById('feedback').value;
+        alert('Thank you for your feedback: ' + feedback);
+        document.getElementById('feedbackForm').reset();
+        backToForm();
+    }
+
+    function backToForm() {
+        document.getElementById('formContainer').style.display = 'block';
+        document.getElementById('profileContainer').style.display = 'none';
+        document.getElementById('historyContainer').style.display = 'none';
+        document.getElementById('feedbackContainer').style.display = 'none';
+        document.getElementById('suggestionsContainer').style.display = 'none';
+    }
+
+    function logout() {
+        document.getElementById('formContainer').style.display = 'none';
+        showLogin();
+    }
+
+    function toggleVisibility(id) {
+        const containers = ['loginContainer', 'signupContainer', 'resetPasswordContainer', 'formContainer'];
+        containers.forEach(containerId => {
+            document.getElementById(containerId).style.display = containerId === id ? 'block' : 'none';
+        });
+    }
+
+    window.onload = function() {
+        showLogin(); // Show login form on load
+    }
+</script>
+
+</body>
+</html>
